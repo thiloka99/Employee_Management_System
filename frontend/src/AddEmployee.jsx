@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, {useState} from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function AddEmployee() {
     const [data, setData] = useState({
@@ -7,8 +8,10 @@ function AddEmployee() {
         email: '',
         password: '',
         address: '',
+        salary:'',
         image: ''
     })
+    const navigate = useNavigate()
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -16,10 +19,14 @@ function AddEmployee() {
         formdata.append("name", data.name);
         formdata.append("email", data.email);
         formdata.append("password", data.password);
+        formdata.append("salary", data.salary);
         formdata.append("address", data.address);
         formdata.append("image", data.image);
         axios.post('http://localhost:8081/create', formdata)
-        .then(res => console.log(res))
+        //.then(res => console.log(res))
+        .then(res => {
+            navigate('/employee')
+        }) // register wela create button eke click karata passe ate employee wa add karanna ona button eke pennwa
         .catch(err => console.log(err));
     }
   return (
@@ -39,6 +46,10 @@ function AddEmployee() {
                 <input type="password" class="form-control" id="inputPassword4" placeholder='Password' onChange={e => setData({...data, password:e.target.value})}/>
             </div>
             <div class="col-12">
+                <label for="inputSalary" class="form-label">Salary</label>
+                <input type="text" class="form-control" id="inputAddress" placeholder='Enter Salary' autoComplete='off' onChange={e => setData({...data, salary:e.target.value})}/>
+            </div>
+            <div class="col-12">
                 <label for="inputAddress" class="form-label">Address</label>
                 <input type="text" class="form-control" id="inputAddress" placeholder='No: 50/A, Main road' autoComplete='off' onChange={e => setData({...data, address:e.target.value})}/>
             </div>
@@ -51,7 +62,7 @@ function AddEmployee() {
             </div>
         </form>
     </div>
-  )
+ )
 }
 
 export default AddEmployee

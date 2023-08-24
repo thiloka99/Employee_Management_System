@@ -11,6 +11,7 @@ const app = express();
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.static('public'));
 
 const con = mysql.createConnection({
     host: "localhost",
@@ -40,6 +41,13 @@ con.connect(function(err){
     }
 })
 
+app.get('/getEmployee', (req, res) => {
+    const sql = "SELECT * FROM employee";
+    con.query(sql, (err, result) => {
+        if(err) return res.json({Error: "Get employee error in sql"});
+        return res.json({status: "Success", Result: result})
+    })
+})
 app.post('/login',(req,res) => {
     const sql = "SELECT * FROM users Where email = ? AND password =?";
     con.query(sql, [req.body.email, req.body.password], (err, result) => {
@@ -53,16 +61,17 @@ app.post('/login',(req,res) => {
     })
 })
 
-app.post('/creat', upload.single('image'), (req,res) => {
-    const sql = "INSERT INTO employee (`name`,`email`,`password`,`address`,`image`) VALUES (?)";
+app.post('/create', upload.single('image'), (req,res) => {
+    const sql = "INSERT INTO employee (`name`,`email`,`password`,`salary`,`address`,`image`) VALUES (?)";
     bcrypt.hash(req.body.password.toString(), 10, (err, hash) => {
         if(err) return res.json({Error: "Error in hashing password"});
         const values = [
             req.body.name,
             req.body.email,
             hash,
+            req.body.salary,
             req.body.address,
-            req.file.filename
+            req.file.filename,
         ]
         con.query(sql, [values], (err, result) => {
             if(err) return res.json({Error: "Inside singup query"});
@@ -70,6 +79,13 @@ app.post('/creat', upload.single('image'), (req,res) => {
         })
     })
 })
+
+
+// me pahala console.log eken terminal eke pennanwa api upload karana image eke wisthara
+// app.post('/create', upload.single('image'), (req,res) => {
+//     console.log(req.file);
+// })
+
 app.listen(8081, ()=>{
     console.log("Running");
-})
+});
